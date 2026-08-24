@@ -34,6 +34,27 @@ export const AsciiBackground: React.FC = () => {
     // Mobile / Touch check
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+    let lastTime = 0;
+    const targetFps = 30;
+    const frameInterval = 1000 / targetFps;
+    const radiusSq = radius * radius;
+
+    let vignetteGradient: CanvasGradient | null = null;
+
+    const createVignette = () => {
+      if (!ctx || width === 0 || height === 0) return;
+      vignetteGradient = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        Math.min(width, height) * 0.35,
+        width / 2,
+        height / 2,
+        Math.max(width, height) * 0.8
+      );
+      vignetteGradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vignetteGradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+    };
+
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = window.innerWidth;
@@ -48,6 +69,7 @@ export const AsciiBackground: React.FC = () => {
 
       cols = Math.ceil(width / cellWidth);
       rows = Math.ceil(height / cellHeight);
+      createVignette();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -69,7 +91,13 @@ export const AsciiBackground: React.FC = () => {
 
     let time = 0;
 
-    const render = () => {
+    const render = (timestamp: number) => {
+      animationFrameId = requestAnimationFrame(render);
+
+      const elapsed = timestamp - lastTime;
+      if (elapsed < frameInterval) return;
+      lastTime = timestamp - (elapsed % frameInterval);
+
       time += 0.03;
       ctx.clearRect(0, 0, width, height);
 
@@ -87,32 +115,28 @@ export const AsciiBackground: React.FC = () => {
           const y = r * cellHeight + cellHeight / 2;
 
           let char = '.';
-          let opacity = 0.14; // Crisp, clearly visible base opacity
+          let opacity = 0.14;
 
           if (isTouchDevice) {
-            // Ambient wave animation for mobile / touch
             const wave = Math.sin(time + c * 0.15 + r * 0.15);
             const ambientIndex = Math.floor(((wave + 1) / 2) * (AMBIENT_CHAR_SET.length - 1));
             char = AMBIENT_CHAR_SET[ambientIndex];
             opacity = 0.10 + ((wave + 1) / 2) * 0.10;
           } else {
-            // Distance to cursor
             const dx = x - currentX;
             const dy = y - currentY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+            const distSq = dx * dx + dy * dy;
 
-            if (dist < radius) {
-              const factor = 1 - dist / radius; // 1 at center, 0 at edge
-              // Shift character based on proximity
+            if (distSq < radiusSq) {
+              const dist = Math.sqrt(distSq);
+              const factor = 1 - dist / radius;
               const charIndex = Math.min(
                 CHAR_SET.length - 1,
                 Math.floor(factor * (CHAR_SET.length - 1))
               );
               char = CHAR_SET[charIndex];
-              // Enhanced contrast cursor glow (up to 0.65)
               opacity = 0.14 + factor * 0.51;
             } else {
-              // Base state ambient micro pulse
               const baseWave = Math.sin(time * 0.5 + c * 0.05 + r * 0.05);
               opacity = 0.11 + ((baseWave + 1) / 2) * 0.06;
               char = Math.random() > 0.985 ? '*' : '.';
@@ -124,25 +148,13 @@ export const AsciiBackground: React.FC = () => {
         }
       }
 
-      // Vignette effect overlay
-      const vignette = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        Math.min(width, height) * 0.35,
-        width / 2,
-        height / 2,
-        Math.max(width, height) * 0.8
-      );
-      vignette.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      vignette.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
-
-      ctx.fillStyle = vignette;
-      ctx.fillRect(0, 0, width, height);
-
-      animationFrameId = requestAnimationFrame(render);
+      if (vignetteGradient) {
+        ctx.fillStyle = vignetteGradient;
+        ctx.fillRect(0, 0, width, height);
+      }
     };
 
-    render();
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener('resize', resize);

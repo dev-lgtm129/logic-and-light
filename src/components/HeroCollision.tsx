@@ -22,7 +22,8 @@ interface CardPath {
 export const HeroCollision: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
-  const [cards, setCards] = useState<CardPath[]>([]);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const cardElementsRef = useRef<(HTMLDivElement | null)[]>([]);
   const cardsRef = useRef<CardPath[]>([]);
 
   useEffect(() => {
@@ -46,24 +47,18 @@ export const HeroCollision: React.FC = () => {
         bottom: textBounds.bottom - containerBounds.top + 20,
       };
 
-      const photos = getHeroCollisionPhotos().slice(0, 5);
+      const loadedPhotos = getHeroCollisionPhotos().slice(0, 5);
+      setPhotos(loadedPhotos);
 
-      // 5 distinct non-overlapping straight-line trajectories (Top-Left, Top-Right, Bottom-Left, Bottom-Right, Top-Center)
       const rayConfigs = [
-        // 1. Top-Left -> Text Top-Left
         { start: { x: 30, y: 80 }, target: { x: textRect.left - cardSize, y: textRect.top - cardSize / 2 } },
-        // 2. Top-Right -> Text Top-Right
         { start: { x: width - cardSize - 30, y: 80 }, target: { x: textRect.right, y: textRect.top - cardSize / 2 } },
-        // 3. Bottom-Left -> Text Bottom-Left
         { start: { x: 30, y: height - cardSize - 60 }, target: { x: textRect.left - cardSize, y: textRect.bottom - cardSize / 2 } },
-        // 4. Bottom-Right -> Text Bottom-Right
         { start: { x: width - cardSize - 30, y: height - cardSize - 60 }, target: { x: textRect.right, y: textRect.bottom - cardSize / 2 } },
-        // 5. Top-Center -> Text Top-Center
         { start: { x: width / 2 - cardSize / 2, y: 60 }, target: { x: width / 2 - cardSize / 2, y: textRect.top - cardSize } },
       ];
 
-      // Staggered frame delays (0, 40, 80, 120, 160 frames)
-      const initialCards: CardPath[] = photos.map((src, idx) => {
+      const initialCards: CardPath[] = loadedPhotos.map((src, idx) => {
         const config = rayConfigs[idx % rayConfigs.length];
         return {
           id: `card-${idx}`,
@@ -76,13 +71,12 @@ export const HeroCollision: React.FC = () => {
           currentY: config.start.y,
           progress: 0,
           direction: 'waiting',
-          delayFrames: idx * 45, // Staggered entry
+          delayFrames: idx * 45,
           size: cardSize,
         };
       });
 
       cardsRef.current = initialCards;
-      setCards(initialCards);
     };
 
     setupPaths();
@@ -91,50 +85,46 @@ export const HeroCollision: React.FC = () => {
     let animationFrameId: number;
 
     const animate = () => {
-      const inboundSpeed = 0.008; // Fast, direct inbound trajectory (~120 frames)
-      const outboundSpeed = 0.003; // Inelastic collision energy loss (~330 frames, noticeably slower)
+      const inboundSpeed = 0.008;
+      const outboundSpeed = 0.003;
 
-      const updated = cardsRef.current.map((card) => {
+      cardsRef.current.forEach((card, idx) => {
         let { startX, startY, targetX, targetY, progress, direction, delayFrames } = card;
 
         if (direction === 'waiting') {
           if (delayFrames > 0) {
-            return { ...card, delayFrames: delayFrames - 1 };
+            card.delayFrames = delayFrames - 1;
+            return;
           }
           direction = 'inbound';
+          card.direction = 'inbound';
         }
 
         if (direction === 'inbound') {
           progress += inboundSpeed;
           if (progress >= 1) {
             progress = 1;
-            direction = 'outbound'; // Collision event! Retrace path at slower speed
+            direction = 'outbound';
           }
         } else if (direction === 'outbound') {
           progress -= outboundSpeed;
           if (progress <= 0) {
             progress = 0;
             direction = 'waiting';
-            delayFrames = 30; // Brief pause before next cycle
+            card.delayFrames = 30;
           }
         }
 
-        // Linear interpolation along straight-line trajectory
-        const currentX = startX + (targetX - startX) * progress;
-        const currentY = startY + (targetY - startY) * progress;
+        card.progress = progress;
+        card.direction = direction;
+        card.currentX = startX + (targetX - startX) * progress;
+        card.currentY = startY + (targetY - startY) * progress;
 
-        return {
-          ...card,
-          currentX,
-          currentY,
-          progress,
-          direction,
-          delayFrames,
-        };
+        const el = cardElementsRef.current[idx];
+        if (el) {
+          el.style.transform = `translate3d(${Math.round(card.currentX)}px, ${Math.round(card.currentY)}px, 0)`;
+        }
       });
-
-      cardsRef.current = updated;
-      setCards([...updated]);
 
       animationFrameId = requestAnimationFrame(animate);
     };
@@ -154,19 +144,20 @@ export const HeroCollision: React.FC = () => {
     >
       {/* Straight-Line Trajectory Photo Cards (Non-interactive ambient collision) */}
       <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
-        {cards.map((card) => (
+        {photos.map((src, idx) => (
           <div
-            key={card.id}
+            key={`card-${idx}`}
+            ref={(el) => (cardElementsRef.current[idx] = el)}
             style={{
-              transform: `translate3d(${Math.round(card.currentX)}px, ${Math.round(card.currentY)}px, 0)`,
-              width: `${card.size}px`,
-              height: `${card.size}px`,
+              width: `160px`,
+              height: `160px`,
+              transform: `translate3d(0px, 0px, 0)`,
             }}
             className="absolute top-0 left-0 opacity-45 pointer-events-none select-none will-change-transform"
           >
             <div className="w-full h-full rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-zinc-900">
               <img
-                src={card.src}
+                src={src}
                 alt="Photography frame"
                 className="w-full h-full object-cover aspect-square pointer-events-none select-none"
                 loading="eager"

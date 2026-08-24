@@ -142,7 +142,7 @@ const FlapCell = React.memo(function FlapCell({
           <motion.div
             key={flipId}
             className={cn(
-              "absolute inset-x-0 top-0 z-10 h-[calc(50%-0.5px)] origin-bottom overflow-hidden rounded-t-[3px] backface-hidden transform-3d",
+              "absolute inset-x-0 top-0 z-10 h-[calc(50%-0.5px)] origin-bottom overflow-hidden rounded-t-[3px] backface-hidden transform-3d will-change-transform",
               flapTopBg,
             )}
             initial={{ rotateX: 0 }}
@@ -172,7 +172,7 @@ const FlapCell = React.memo(function FlapCell({
           <motion.div
             key={`b${flipId}`}
             className={cn(
-              "absolute inset-x-0 bottom-0 z-10 h-[calc(50%-0.5px)] origin-top overflow-hidden rounded-b-[3px] backface-hidden transform-3d",
+              "absolute inset-x-0 bottom-0 z-10 h-[calc(50%-0.5px)] origin-top overflow-hidden rounded-b-[3px] backface-hidden transform-3d will-change-transform",
               cardBg,
             )}
             initial={{ rotateX: 90 }}

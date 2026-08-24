@@ -58,6 +58,7 @@
 html, body {
   background-color: var(--bg-color);
   color: var(--text-main);
+  text-rendering: optimizeLegibility;
   font-family: var(--font-sans);
   min-height: 100dvh;
   width: 100%;
