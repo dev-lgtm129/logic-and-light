@@ -1,6 +1,5 @@
 export interface ProjectConfig {
   repoUrl: string;
-  language?: string;
 }
 
 export const parseRepoName = (url: string): string => {
@@ -16,6 +15,8 @@ export const parseRepoName = (url: string): string => {
 export const PROJECTS: ProjectConfig[] = [
   {
     repoUrl: 'https://github.com/dev-lgtm129/MoodMix',
-    language: 'TypeScript',
+  },
+  {
+    repoUrl: 'https://github.com/dev-lgtm129/logic-and-light',
   },
 ];
