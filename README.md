@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ LOGIC & LIGHT
+# LOGIC & LIGHT
 
 ### *Architectural Software Engineering & Minimalist Visual Arts*
 
@@ -18,17 +18,17 @@ A high-performance, spatial web application designed with precision engineering,
 
 <br />
 
-## 🌟 Key Engineering Features
+## Key Engineering Features
 
-- 🛫 **Retro Split-Flap Matrix Display**: Real-time mechanical split-flap text board with 1.0s flip animations, dynamic live counting of photography feeds & coding repositories, real-time clock, and a time-based easter egg system.
-- 📐 **3D Perspective Memory Array Grid**: Interactive 9x7 perspective grid featuring custom hover digit decay and soft radial edge fading.
-- 📸 **Dynamic Photography Gallery Stream**: Dual-row staggered gallery feed with dynamic image preloading and fluid full-screen lightbox interactions.
-- ⚡ **Button Wipe Page Transitions**: Custom spatial page transitions between Home, Coding, and Photography modules.
-- 🎨 **Minimalist Monochromatic Aesthetic**: Curated dark-mode design system built with custom Geist variable typography, glassmorphism, and subtle micro-animations.
+- **Retro Split-Flap Matrix Display**: Real-time mechanical split-flap text board with 1.0s flip animations, dynamic live counting of photography feeds & coding repositories, real-time clock, and a time-based easter egg system.
+- **3D Perspective Memory Array Grid**: Interactive 9x7 perspective grid featuring custom hover digit decay and soft radial edge fading.
+- **Dynamic Photography Gallery Stream**: Dual-row staggered gallery feed with dynamic image preloading and fluid full-screen lightbox interactions.
+- **Button Wipe Page Transitions**: Custom spatial page transitions between Home, Coding, and Photography modules.
+- **Minimalist Monochromatic Aesthetic**: Curated dark-mode design system built with custom Geist variable typography, glassmorphism, and subtle micro-animations.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## Tech Stack & Architecture
 
 | Layer | Technology |
 | :--- | :--- |
@@ -40,7 +40,7 @@ A high-performance, spatial web application designed with precision engineering,
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 logic-and-light/
@@ -73,7 +73,7 @@ logic-and-light/
 
 ---
 
-## 🚀 Local Development Setup
+## Local Development Setup
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18+ recommended)
@@ -108,7 +108,7 @@ npm run preview
 
 ---
 
-## ⚙️ Configuration & Customization
+## Configuration & Customization
 
 - **Time Easter Eggs**: Edit [`src/utils/timeEasterEggs.ts`](src/utils/timeEasterEggs.ts) to update time-based messages displayed on the split-flap board.
 - **GitHub Repositories**: Add or edit projects in [`src/utils/projectConfig.ts`](src/utils/projectConfig.ts).
