@@ -31,5 +31,5 @@ dist-ssr/
 .env.test.local
 .env.production.local
 #Agent
-.agent
-.gemini
+.agent/
+.gemini/
