@@ -80,7 +80,7 @@ const FlapCell = React.memo(function FlapCell({
   const showPrev = prev === " " ? "\u00A0" : prev;
 
   const textCx =
-    "absolute inset-x-0 flex select-none items-center justify-center font-mono font-black tracking-wider text-zinc-50 drop-shadow-[0_0_4px_rgba(255,255,255,0.7)]";
+    "absolute inset-x-0 flex select-none items-center justify-center font-mono font-black tracking-wider text-zinc-50 [text-shadow:0_0_4px_rgba(255,255,255,0.7)]";
   const cardBg = "bg-zinc-950 border-zinc-700/80";
   const flapTopBg = "bg-zinc-900 border-zinc-700/80";
 
